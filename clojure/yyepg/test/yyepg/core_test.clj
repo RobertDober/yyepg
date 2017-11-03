@@ -3,8 +3,10 @@
             [midje.sweet :refer :all]
             [yyepg.core :refer :all]))
 
-(facts "about equity"
-  (fact "1 equals 1"
-        1 => 1))
-
-
+(facts "parsing"
+  (fact "empty"
+        (parse "") => [])
+  
+  (fact "text"
+        (parse "hello") => [:text "hello" {}])
+  )

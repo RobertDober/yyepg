@@ -1,0 +1,4 @@
+S = Header | Text
+WS = #"\s+"
+Header = #"#+" WS 
+Text   = #".*"

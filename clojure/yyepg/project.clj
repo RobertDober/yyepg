@@ -4,4 +4,5 @@
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [midje "1.8.3"]])
+                 [midje "1.8.3"]
+                 [instaparse "1.4.8"]])
