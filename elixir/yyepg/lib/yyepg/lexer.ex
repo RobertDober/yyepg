@@ -1,7 +1,6 @@
 defmodule YYepg.Lexer do
   
-  @type token_t :: {atom(), binary(), number()}
-  @type token_ts :: list(token_t)
+  use YYepg.Types
 
   @spec lex( binary() ) :: token_ts
   def lex string do
