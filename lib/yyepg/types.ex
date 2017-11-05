@@ -1,13 +1,7 @@
 defmodule YYepg.Types do
 
-  defmacro __using__( options \\ [] ) do
+  defmacro __using__( _options \\ [] ) do
     quote do
-      @type token_t  :: {atom(), binary(), number()}
-      @type token_ts :: list(token_t)
-
-      @type block_t  :: {atom(), binary(), map(), block_ts}
-      @type block_ts :: list(block_t)
-
       @type status_t :: :ok | :error
 
       # Semantic meaning
@@ -26,6 +20,10 @@ defmodule YYepg.Types do
 
       @type message_t  :: {severity_t, binary(), number()}
       @type message_ts :: list(message_t)
+
+
+      @type numbered_line_t  :: {binary(), number()}
+      @type numbered_line_ts :: list(numbered_line_t)
     end
   end
   
