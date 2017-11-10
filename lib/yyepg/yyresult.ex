@@ -2,9 +2,12 @@ defmodule YYepg.YYResult do
 
   use YYepg.Types
   alias YYepg.YYStructure
+  alias YYepg.YYMessage
 
-  defstruct status: :ok, yystructures: [], messages: []
-  @type t :: %__MODULE__{status: status_t, yystructures: YYStructure.ts, messages: message_ts}
+  defstruct status: :ok, yystructures: [], messages: [], current_yystructure: nil
+
+  @type status_t :: :ok | :error
+  @type t :: %__MODULE__{status: status_t, yystructures: YYStructure.ts, messages: YYMessage.ts, current_yystructure: maybe(YYStructure.t)}
 
   @type partial_t :: { numbered_line_ts, t }
 

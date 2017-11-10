@@ -69,6 +69,16 @@ defmodule YYepg.Parser do
   @spec parse_content_of_section( numbered_line_ts, YYResult.t ) :: YYResult.partial_t
   defp parse_content_of_section numbered_lines, yyresult
 
+  defp parse_content_of_section numbered_lines=[{_,lnb}|_], yyresult=%{current_yystructure: nil} do
+    with new_yystructure <- YYStructure.make_implicit(yyresult.yystructures) do
+      parse_content_of_section(
+        numbered_lines,
+        %{yyresult |
+           messages: 
+             YYMessage.add(yyresult.messages, {:warning, "Made an implicit structure #{new_yystructure}", lnb}),
+           current_yystructure: new_yystructure})
+    end
+  end
   defp parse_content_of_section numbered_lines, yyresult do 
     {numbered_lines, yyresult}
   end

@@ -9,4 +9,11 @@ defmodule YYepg.YYStructure do
       yychildren: ts}
   @type ts :: list( t )
 
+  @spec make_implicit( ts ) :: t
+  def make_implicit structures
+
+  def make_implicit [] do
+    %__MODULE__{yyatts: %{level: 1}}
+  end
+
 end
