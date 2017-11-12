@@ -1,4 +1,4 @@
-defmodule Yyepg.YYMessage do
+defmodule YYepg.YYMessage do
 
   defstruct severity: :error, message: "", line_number: 0
 

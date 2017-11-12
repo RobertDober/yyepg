@@ -4,6 +4,8 @@ defmodule YYepg.Parser do
 
   alias YYepg.YYResult
   alias YYepg.YYStructure
+  alias YYepg.YYMessage
+  alias YYepg.YYLine
 
   @spec parse( binary() ) :: YYResult.t
   def parse string
@@ -11,6 +13,7 @@ defmodule YYepg.Parser do
     string
     |> String.split(~r{\n\r?}) 
     |> Enum.with_index()
+    |> Enum.map(&YYLine.new/1)
     |> parse_structures()
   end
 
@@ -19,7 +22,7 @@ defmodule YYepg.Parser do
   @section_closer ~r{\A(\w*)(>+)(?!\S)(.*)}
   
 
-  @spec parse_structures( numbered_line_ts ) :: YYResult.t
+  @spec parse_structures( YYLine.ts ) :: YYResult.t
   def parse_structures numbered_lines
 
   def parse_structures( [] ), do: %YYResult{}
@@ -32,7 +35,7 @@ defmodule YYepg.Parser do
   end
 
   # First line is not empty anymore
-  @spec parse_structures1( numbered_line_ts, YYResult.t ) :: YYResult.t
+  @spec parse_structures1( YYLine.ts, YYResult.t ) :: YYResult.t
   defp parse_structures1 numbered_lines, yyresult
   
   defp parse_structures1( [], yyresult ), do: YYResult.finalize(yyresult)
@@ -52,21 +55,21 @@ defmodule YYepg.Parser do
   end
 
 
-  @spec parse_rest_of_section( list(binary()), numbered_line_ts, YYResult.t ) :: YYResult.partial_t
+  @spec parse_rest_of_section( list(binary()), YYLine.ts, YYResult.t ) :: YYResult.partial_t
   defp parse_rest_of_section matches, numbered_lines, yyresult
 
   defp parse_rest_of_section _matches, numbered_lines, yyresult do 
     {numbered_lines, yyresult}
   end
 
-  @spec parse_close_section( list(binary()), numbered_line_ts, YYResult.t ) :: YYResult.partial_t
+  @spec parse_close_section( list(binary()), YYLine.ts, YYResult.t ) :: YYResult.partial_t
   defp parse_close_section matches, numbered_lines, yyresult
 
   defp parse_close_section _matches, numbered_lines, yyresult do 
     {numbered_lines, yyresult}
   end
 
-  @spec parse_content_of_section( numbered_line_ts, YYResult.t ) :: YYResult.partial_t
+  @spec parse_content_of_section( YYLine.ts, YYResult.t ) :: YYResult.partial_t
   defp parse_content_of_section numbered_lines, yyresult
 
   defp parse_content_of_section numbered_lines=[{_,lnb}|_], yyresult=%{current_yystructure: nil} do

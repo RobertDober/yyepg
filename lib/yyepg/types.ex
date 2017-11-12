@@ -4,7 +4,6 @@ defmodule YYepg.Types do
     quote do
 
       @type numbered_line_t  :: {binary(), number()}
-      @type numbered_line_ts :: list(numbered_line_t)
 
       # Metatypes
       @type maybe(t) :: t | nil
