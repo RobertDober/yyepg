@@ -5,10 +5,10 @@ defmodule YYepg.YYResult do
   alias YYepg.YYMessage
   alias YYepg.YYLine
 
-  defstruct status: :ok, yystructures: [], messages: [], current_yystructure: nil
+  defstruct status: :ok, yystructures: [], messages: []
 
   @type status_t :: :ok | :error
-  @type t :: %__MODULE__{status: status_t, yystructures: YYStructure.ts, messages: YYMessage.ts, current_yystructure: maybe(YYStructure.t)}
+  @type t :: %__MODULE__{status: status_t, yystructures: YYStructure.ts, messages: YYMessage.ts}
 
   @type partial_t :: { YYLine.ts , t }
 
@@ -16,10 +16,15 @@ defmodule YYepg.YYResult do
   @doc """
   Just reverse the yystructures list
   """
-  @spec finalize( t ) :: t
-  def finalize yyresult
+  @spec finalize( t, YYStructure.ts ) :: t
+  def finalize yyresult, open_sections
 
-  def finalize yyresult = %__MODULE__{yystructures: yystructures} do 
+  def finalize yyresult = %{yystructures: yystructures}, [] do 
     %{yyresult | yystructures: Enum.reverse( yystructures )}
+  end
+  def finalize yyresult = %{messages: messages}, open_sections do
+    with messages <- YYMessage.add_warnings_for_open_sections(messages, open_sections) do
+      finalize %{yyresult | messages: messages}, []
+    end
   end
 end

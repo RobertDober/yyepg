@@ -3,7 +3,7 @@ defmodule YYepg.Parser do
   use YYepg.Types
 
   alias YYepg.YYResult
-  alias YYepg.YYStructure
+  alias YYepg.YYStructure.YYSection
   alias YYepg.YYMessage
   alias YYepg.YYLine
   alias YYepg.YYLine.YYBeginSection
@@ -49,11 +49,12 @@ defmodule YYepg.Parser do
   end
 
   # First line is not empty anymore
-  @spec parse_structures1( YYLine.ts, YYResult.t ) :: YYResult.t
-  defp parse_structures1 numbered_lines, yyresult
+  @spec parse_structures1( YYLine.ts, YYResult.t, YYSection.ts ) :: YYResult.t
+  defp parse_structures1 yylines, yyresult, open_sections
   
-  defp parse_structures1( [], yyresult ), do: YYResult.finalize(yyresult)
-  defp parse_structures1( numbered_lines = [numbered_line | rest], yyresult ) do
+  defp parse_structures1( [], yyresult, open_sections ), do: YYResult.finalize(yyresult, open_sections)
+  defp parse_structures1( yylines = [%YYText{} | rest], yyresult, open_sections ) do
+    # add error about adding default segment ">"
     with {text, lnb} <- numbered_line do
       {rest1, yyresult1} = 
         cond do
@@ -87,14 +88,6 @@ defmodule YYepg.Parser do
   defp parse_content_of_section numbered_lines, yyresult
 
   defp parse_content_of_section numbered_lines=[{_,lnb}|_], yyresult=%{current_yystructure: nil} do
-    with new_yystructure <- YYStructure.make_implicit(yyresult.yystructures) do
-      parse_content_of_section(
-        numbered_lines,
-        %{yyresult |
-           messages: 
-             YYMessage.add(yyresult.messages, {:warning, "Made an implicit structure #{new_yystructure}", lnb}),
-           current_yystructure: new_yystructure})
-    end
   end
   defp parse_content_of_section numbered_lines, yyresult do 
     {numbered_lines, yyresult}

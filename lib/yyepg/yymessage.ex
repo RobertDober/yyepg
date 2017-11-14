@@ -1,5 +1,7 @@
 defmodule YYepg.YYMessage do
 
+  alias YYepg.YYStructure.YYSection
+
   defstruct severity: :error, message: "", line_number: 0
 
   # Semantic meaning
@@ -24,5 +26,24 @@ defmodule YYepg.YYMessage do
 
   def add messages, {severity, message, line_number} do
     [%__MODULE__{severity: severity, message: message, line_number: line_number} | messages]
+  end
+
+  @spec add_warnings_for_open_sections( ts, YYSection.ts ) :: ts
+  def add_warnings_for_open_sections messages, open_sections
+
+  def add_warnings_for_open_sections messages, [] do
+    messages
+  end
+  def add_warnings_for_open_sections messages, [open_section | rest] do
+    add_warnings_for_open_sections(
+      add_warning_for_open_section(messages, open_section), rest)
+  end
+
+  defp add_warning_for_open_section messages, %{content: content, line_numbers: {lnb_beg, lnb_end}} do
+    [ %__MODULE__{
+        severity: :warning,
+        line_number: lnb_end,
+        message: "Implicitly closing section #{inspect(content)} starting in line #{lnb_beg}"
+      } | messages]
   end
 end

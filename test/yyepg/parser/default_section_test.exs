@@ -3,6 +3,7 @@ defmodule Yyepg.Parser.DefaultSectionTest do
 
   import YYepg.Parser, only: [parse: 1]
   alias YYepg.YYStructure, as: S
+  alias YYepg.YYResult, as: R
   import Support.Result
 
   describe "default section" do
@@ -20,9 +21,10 @@ defmodule Yyepg.Parser.DefaultSectionTest do
     end
 
     test "explicit, without warning" do
-      text = %S{yytype: :_text, yycontent: "alpha"}
-      structure = [%S{yytype: :yysection, yyatts: %{level: 1}, yychildren: [text]}]
-      assert parse(">\nalpha\n<") == ok_result(structure)
+      raw_line = %S.RawLines{lines: [{"alpha", 2}]}
+      section  = %S.Section{level: 1, name: "", content: ">", line_numbers: {1, 3}, children: [raw_line]}
+      result   = %R{yystructures: [section]}
+      assert parse(">\nalpha\n<") == result
     end
   end
 end
