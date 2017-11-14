@@ -6,7 +6,15 @@ defmodule YYepg.Parser do
   alias YYepg.YYStructure
   alias YYepg.YYMessage
   alias YYepg.YYLine
+  alias YYepg.YYLine.YYBeginSection
+  alias YYepg.YYLine.YYEndSection
+  alias YYepg.YYLine.YYText
 
+
+  @doc """
+  A convienience function splitting a string into lines, parsing the lines and passing the parsed lines
+  on to the structural parse funcion `parse_structures`.
+  """
   @spec parse( binary() ) :: YYResult.t
   def parse string
   def parse string do
@@ -22,16 +30,22 @@ defmodule YYepg.Parser do
   @section_closer ~r{\A(\w*)(>+)(?!\S)(.*)}
   
 
+  @doc """
+  Skips empty lines before parsing the rest of the lines with `parse_structures1`.
+  """
   @spec parse_structures( YYLine.ts ) :: YYResult.t
-  def parse_structures numbered_lines
+  def parse_structures yylines
 
   def parse_structures( [] ), do: %YYResult{}
-  def parse_structures( [numbered_line | rest] ) do
-    with {text, _} <- numbered_line do
-      if Regex.match?(@empty_line, text),
-        do: parse_structures(rest),
-        else: parse_structures1(rest, %YYResult{})
+  def parse_structures( yylines = [%YYText{content: content} | rest] ) do
+    if Regex.match?(@empty_line, content) do
+      parse_structures(rest)
+    else
+      parse_structures1(yylines, %YYResult{})
     end
+  end
+  def parse_structures( yylines ) do
+    parse_structures1(yylines, %YYResult{})
   end
 
   # First line is not empty anymore
