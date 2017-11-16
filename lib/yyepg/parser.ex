@@ -49,47 +49,29 @@ defmodule YYepg.Parser do
   end
 
   # First line is not empty anymore
-  @spec parse_structures1( YYLine.ts, YYResult.t, YYSection.ts ) :: YYResult.t
-  defp parse_structures1 yylines, yyresult, open_sections
+  @spec parse_structures1( YYLine.ts, YYResult.t) :: YYResult.t
+  defp parse_structures1 yylines, yyresult
   
-  defp parse_structures1( [], yyresult, open_sections ), do: YYResult.finalize(yyresult, open_sections)
-  defp parse_structures1( yylines = [%YYText{} | rest], yyresult, open_sections ) do
-    # add error about adding default segment ">"
-    with {text, lnb} <- numbered_line do
-      {rest1, yyresult1} = 
-        cond do
-          matches = Regex.run(@section_opener, text) ->
-            parse_rest_of_section(matches, numbered_lines, yyresult)
-          matches = Regex.run(@section_closer, text) ->
-            parse_close_section(matches, numbered_lines, yyresult)
-          true ->
-            parse_content_of_section(numbered_lines, yyresult)
-        end
-      parse_structures1(rest1, yyresult1)
-    end
+  defp parse_structures1( [], yyresult ), do: YYResult.finalize(yyresult, [])
+  defp parse_structures1( yylines = [%YYText{line_nb: line_nb} | rest], yyresult ) do
+    message = %YYMessage{severity: :warning, line_nb: line_nb, message: "Implicitly opening a default section \">\" before this line"}
+    section = YYSection.from_numbered_line({">", line_nb})
+    parse_section( yylines, %{yyresult | messages: [message]}, [section] )
+  end
+  defp parse_structures1( yylines = [%YYEndSection{line_nb: line_nb} | rest], yyresult, open_sections) do
+    messages = [%YYMessage{severity: :fatal, line_nb: line_nb, message: "Closing a section at beginning of file, aborting..."}]
+    %{yyresult | status: :error, messages: messages} 
+  end
+  defp parse_structures1( yylines = [begin_section | rest], yyresult) do
+    section = YYSection.from_yyline( begin_section )
+    parse_section( rest, yyresult, [section] )
   end
 
+  @spec parse_section( YYLine.ts, YYResult.t, YYSection.ts ) :: YYResult
+  defp parse_section yylines, yyresult, open_sections
 
-  @spec parse_rest_of_section( list(binary()), YYLine.ts, YYResult.t ) :: YYResult.partial_t
-  defp parse_rest_of_section matches, numbered_lines, yyresult
+  defp parse_section( yylines, yyresult, open_sections ), do: yyresult
 
-  defp parse_rest_of_section _matches, numbered_lines, yyresult do 
-    {numbered_lines, yyresult}
-  end
 
-  @spec parse_close_section( list(binary()), YYLine.ts, YYResult.t ) :: YYResult.partial_t
-  defp parse_close_section matches, numbered_lines, yyresult
 
-  defp parse_close_section _matches, numbered_lines, yyresult do 
-    {numbered_lines, yyresult}
-  end
-
-  @spec parse_content_of_section( YYLine.ts, YYResult.t ) :: YYResult.partial_t
-  defp parse_content_of_section numbered_lines, yyresult
-
-  defp parse_content_of_section numbered_lines=[{_,lnb}|_], yyresult=%{current_yystructure: nil} do
-  end
-  defp parse_content_of_section numbered_lines, yyresult do 
-    {numbered_lines, yyresult}
-  end
 end

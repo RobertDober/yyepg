@@ -7,4 +7,6 @@ defmodule YYepg.YYline.YYlineTest do
   doctest YYText, import: true
   doctest YYepg.YYLine.YYBeginSection
   doctest YYepg.YYLine.YYEndSection
+
+
 end

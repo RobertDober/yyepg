@@ -2,7 +2,7 @@ defmodule YYepg.YYMessage do
 
   alias YYepg.YYStructure.YYSection
 
-  defstruct severity: :error, message: "", line_number: 0
+  defstruct severity: :error, message: "", line_nb: 0
 
   # Semantic meaning
   #                   +----------------------------------------- no error but the user shall be informed by something, e.g.
@@ -18,14 +18,14 @@ defmodule YYepg.YYMessage do
   #                   v       v          v        v        v
   @type severity_t :: :info | :warning | :error | :fatal | :debug
 
-  @type t :: %__MODULE__{severity: severity_t, message: binary(), line_number: number()}
+  @type t :: %__MODULE__{severity: severity_t, message: binary(), line_nb: number()}
   @type ts :: list(t)
 
   @spec add( ts, {severity_t, binary(), number()} ) :: ts
   def add messages, message_tuple
 
-  def add messages, {severity, message, line_number} do
-    [%__MODULE__{severity: severity, message: message, line_number: line_number} | messages]
+  def add messages, {severity, message, line_nb} do
+    [%__MODULE__{severity: severity, message: message, line_nb: line_nb} | messages]
   end
 
   @spec add_warnings_for_open_sections( ts, YYSection.ts ) :: ts
@@ -42,7 +42,7 @@ defmodule YYepg.YYMessage do
   defp add_warning_for_open_section messages, %{content: content, line_numbers: {lnb_beg, lnb_end}} do
     [ %__MODULE__{
         severity: :warning,
-        line_number: lnb_end,
+        line_nb: lnb_end,
         message: "Implicitly closing section #{inspect(content)} starting in line #{lnb_beg}"
       } | messages]
   end
