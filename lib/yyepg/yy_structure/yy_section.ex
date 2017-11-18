@@ -1,6 +1,7 @@
 defmodule YYepg.YYStructure.YYSection do
   use YYepg.Types
 
+
   alias YYepg.YYLine
 
   defstruct level: 1, name: "", content: "", line_numbers: {0, 0}, children: []
@@ -14,7 +15,7 @@ defmodule YYepg.YYStructure.YYSection do
     children: YYepg.YYStructure.ts}
   @type ts :: list(t)
 
-  @spec from_yyline( YYLine.YYBeginSection ) :: t
+  @spec from_yyline(%YYLine.YYBeginSection{}) :: t
   def from_yyline begin_section 
 
   def from_yyline begin_section do
@@ -25,13 +26,13 @@ defmodule YYepg.YYStructure.YYSection do
     }
   end
 
-  @spec from_numbered_line( numbered_line_t() ) :: t
+  @spec from_numbered_line( numbered_line_t() ) :: either(t)
   def from_numbered_line numbered_line
 
   def from_numbered_line numbered_line do
     case YYLine.new( numbered_line ) do 
-      begin_section = %YYLine.YYBeginSection{} -> from_yyline( begin_section )
-      _                                      -> raise ArgumentError, "must not pass in line that does not open a section"
+      begin_section = %YYLine.YYBeginSection{} -> left(from_yyline( begin_section ))
+      _                                        -> right("not a begin section line")
     end
   end
 

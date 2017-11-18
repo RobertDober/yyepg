@@ -1,4 +1,4 @@
-defmodule YYepg.YYStructure.YYRawLines do
+defmodule YYepg.YYStructure.YYContent do
 
     use YYepg.Types
 
