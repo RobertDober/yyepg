@@ -8,8 +8,4 @@ defmodule YYepg.YYline.YYlineTest do
   doctest YYepg.YYLine.YYBeginSection
   doctest YYepg.YYLine.YYEndSection
 
-
-  test "heelo" do
-  end
-
 end
